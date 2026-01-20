@@ -18,11 +18,11 @@ logger = logging.getLogger(__name__)
 
 
 def get_local_gpu_id():
-    cvd = os.environ.get("CUDA_VISIBLE_DEVICES", None)
+    cvd = os.environ.get("ASCEND_RT_VISIBLE_DEVICES", None)
     if cvd is None:
         return ray.get_gpu_ids()[0]
     else:
-        return cvd.split(",").index(str(ray.get_gpu_ids()[0]))
+        return cvd.split(",").index(str(ray.get_runtime_context().get_accelerator_ids()["NPU"][0]))
 
 
 class TrainRayActor(RayActor):
@@ -55,6 +55,10 @@ class TrainRayActor(RayActor):
         torch.serialization.add_safe_globals([slime.utils.eval_config.EvalDatasetConfig])
 
         local_rank = int(os.environ.get("LOCAL_RANK", 0))
+        if local_rank == 1:
+            local_rank = 9
+        if local_rank == 0:
+            local_rank = 8
         torch.cuda.set_device(f"cuda:{local_rank}")
 
         # Use hybrid backend when FSDP CPU offload is enabled with a CPU backend

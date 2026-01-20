@@ -11,7 +11,7 @@ def train(args):
     # allocate the GPUs
     pgs = create_placement_groups(args)
     init_tracking(args)
-
+    args.offload_train = False
     # create the rollout manager, with sglang engines inside.
     # need to initialize rollout manager first to calculate num_rollout
     rollout_manager, num_rollout_per_epoch = create_rollout_manager(args, pgs["rollout"])

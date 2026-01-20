@@ -8,6 +8,8 @@ from contextlib import nullcontext
 import ray
 import torch
 import torch.distributed as dist
+import mindspeed.megatron_adaptor
+from mindspeed.megatron_adaptor import repatch
 from megatron.core import mpu
 from ray.actor import ActorHandle
 from torch_memory_saver import torch_memory_saver
@@ -55,6 +57,7 @@ class MegatronTrainRayActor(TrainRayActor):
         super().init(args, role, with_ref)
 
         init(args)
+        repatch(args)
 
         if is_megatron_main_rank():
             init_tracking(args, primary=False)

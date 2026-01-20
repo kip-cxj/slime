@@ -12,12 +12,13 @@ def clear_memory(clear_host_memory: bool = False):
     gc.collect()
     torch.cuda.empty_cache()
     if clear_host_memory:
-        torch._C._host_emptyCache()
+        # torch._C._host_emptyCache()
+        torch.npu.empty_cache()
 
 
 def available_memory():
-    device = torch.cuda.current_device()
-    free, total = torch.cuda.mem_get_info(device)
+    device = torch.npu.current_device()
+    free, total = torch.npu.mem_get_info(device)
     return {
         "gpu": str(device),
         "total_GB": _byte_to_gb(total),
